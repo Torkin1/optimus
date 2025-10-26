@@ -3,6 +3,6 @@ torkin.optimus.internal {
                 reverse_proxy whoami:80
         }
         handle / {
-            respond "hello world" 200
+                respond "hello world" 200
         }
 }

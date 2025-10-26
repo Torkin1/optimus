@@ -1,26 +1,24 @@
-version: "3.7"
 services:
   caddy:
-    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    image: caddy:2.10.2
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
     ports:
-      - 8080:80
-      - 443:443/tcp
-      - 443:443/udp
-    environment:
-      - CADDY_INGRESS_NETWORKS=caddy
-      - CADDY_DOCKER_CADDYFILE_PATH=/etc/caddy/Caddyfile
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - $PWD/conf:/etc/caddy
+      # - $PWD/site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
     networks:
       - caddy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - front_caddy_data:/data
-      - source: "./Caddyfile"
-        target: '/etc/caddy/Caddyfile'
-        type: bind
-    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
 
 networks:
   caddy:
-
-volumes:
-  front_caddy_data: {}
