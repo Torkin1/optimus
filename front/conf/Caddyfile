@@ -1,8 +1,12 @@
 torkin.optimus.internal {
-        handle /whoami {
-                reverse_proxy whoami:80
-        }
         handle / {
                 respond "hello world" 200
         }
+}
+torkin.optimus.whoami.internal {
+        reverse_proxy whoami:80
+}
+
+torkin.optimus.phorge.internal {
+        reverse_proxy phorge_caddy:80
 }

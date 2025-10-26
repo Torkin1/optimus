@@ -1,0 +1,64 @@
+version: "3.7"
+# https://docs.docker.com/compose/compose-file/compose-file-v3/
+services:
+
+  phorge_caddy:
+    image: caddy:2.10.2
+    volumes:
+      - phorge_web:/var/www/html
+      - phorge_caddy_data:/data
+      - ./phorge_caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - phorge
+      - front_caddy
+    environment:
+      # https://caddyserver.com/docs/automatic-https#overview
+      - DOMAIN=:80
+      - HTTPS=off
+
+  phorge_mariadb:
+    image: mariadb:lts-ubi9
+    volumes:
+      - phorge_db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+    command: --innodb-buffer-pool-size=268435456 --local-infile=0 --max-allowed-packet=33554432 --sql-mode=STRICT_ALL_TABLES
+    networks:
+      - phorge_db
+    secrets:
+      - db_root_password
+
+  phorge:
+    image: zeigren/phorge:1.1.0
+    volumes:
+      - phorge_web:/var/www/html
+      - phorge_ssh:/etc/ssh
+      - phorge_repo:/var/repo
+      # mount entrypoint script read-only to speed up execution
+      - ./phorge_entrypoint.sh:/bin/phorge_entrypoint.sh:ro
+    # environment is defined in the custom entrypoint script
+    entrypoint:
+      - /bin/sh 
+      - /bin/phorge_entrypoint.sh
+    networks:
+      - phorge
+      - phorge_db
+    secrets:
+      - db_root_password
+
+volumes:
+  phorge_db:
+  phorge_web:
+  phorge_ssh:
+  phorge_repo:
+  phorge_caddy_data:
+
+networks:
+  phorge:
+  phorge_db:
+  front_caddy:
+    external: true
+
+secrets:
+  db_root_password:
+    file: ./secrets/db_root_password.secret
