@@ -3,12 +3,12 @@ services:
   whoami:
     image: traefik/whoami
     networks:
-      - front_caddy
+      - front_internal
     # labels:
     #   caddy: torkin.optimus.internal
     #   caddy.handle: /whoami
     #   caddy.handle.0_reverse_proxy: whoami:80
 
 networks:
-  front_caddy:
+  front_internal:
     external: true

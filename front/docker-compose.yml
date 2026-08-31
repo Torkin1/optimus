@@ -1,7 +1,8 @@
 services:
   caddy:
     image: caddy:2.10.2
-    restart: unless-stopped
+    security_opt:
+      - label=disable 
     cap_add:
       - NET_ADMIN
     ports:
@@ -9,15 +10,23 @@ services:
       - "443:443"
       - "443:443/udp"
     volumes:
-      - $PWD/conf:/etc/caddy
+      - ./conf:/etc/caddy:ro
       - caddy_data:/data
       - caddy_config:/config
+      # tailscale creates its socket on /tmp, so we'll kidnap from there to expose to caddy
+      - /run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
     networks:
-      - caddy
+      - internal
+      - public
+    # extra_hosts:
+    # - "host.docker.internal:host-gateway"
+    
 
 volumes:
   caddy_data:
   caddy_config:
 
 networks:
-  caddy:
+  internal:
+    internal: true
+  public:

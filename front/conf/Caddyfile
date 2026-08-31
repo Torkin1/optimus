@@ -1,12 +1,18 @@
-torkin.optimus.internal {
+t540p.tail174649.ts.net:443 {
         handle / {
-                respond "hello world" 200
+                respond "hello world! :)" 200
         }
+        handle_path /whoami {
+                reverse_proxy whoami:80
+        }
+        handle {
+                respond "Nothing here :(" 404
+    }
 }
-torkin.optimus.whoami.internal {
-        reverse_proxy whoami:80
-}
+# torkin.optimus.whoami.internal {
+#         reverse_proxy whoami:80
+# }
 
-torkin.optimus.phorge.internal {
-        reverse_proxy phorge_caddy:80
-}
+# torkin.optimus.phorge.internal {
+#         reverse_proxy phorge_caddy:80
+# }
