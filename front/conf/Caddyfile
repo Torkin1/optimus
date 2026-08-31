@@ -1,13 +1,24 @@
 t540p.tail174649.ts.net:443 {
+        # reverse_proxy jellyfin:8096
+        # }        
         handle / {
                 respond "hello world! :)" 200
         }
-        handle_path /whoami {
-                reverse_proxy whoami:80
+        # handle_path /whoami {
+        #         reverse_proxy whoami:80
+        # }
+        handle /jellyfin* {
+                reverse_proxy jellyfin:8096
         }
-        handle {
-                respond "Nothing here :(" 404
-    }
+        handle_path /deluge* {
+                reverse_proxy deluge:8112 {
+                  header_up X-Real-IP {remote}
+                  header_up X-Deluge-Base "/deluge"
+              }
+        }        
+#         handle {
+#                 respond "Nothing here :(" 404
+#     }
 }
 # torkin.optimus.whoami.internal {
 #         reverse_proxy whoami:80
